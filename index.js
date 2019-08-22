@@ -15,13 +15,24 @@ const languageDetails = {
 
 const imageName = "compiler-image";
 
+// Getting classname of java code
+function getClassName(string) {
+    // Taking care of any parent classes
+    const classname = string.split('{')[0].split('class')[1].split('extends')[0].trim();
+
+    return classname;
+
+}
+
 const saveCode = (code, language,  id, callback) => {
     console.log(`code ${code}, language ${language}, id: ${id}`);
     exec(`mkdir temp/${id}`, (err) => {
         if(err) {
             console.log(err);
         } else {
-            fs.writeFile(path.join(__dirname, "temp", id, `code.${languageDetails[language]}`), code,  (err) => {
+            const filename = language === 'java' ? getClassName(code).toString() + '.java' : `code.${languageDetails[language]}`;
+            console.log(filename);
+            fs.writeFile(path.join(__dirname, "temp", id, filename ), code,  (err) => {
                 console.log("File saved");
                 const folderToMount = path.join(__dirname, "temp", id);
                 console.log(folderToMount);
