@@ -13,7 +13,7 @@ const interpreterOptions = {
     python: {
         name: 'Python',
         extension: 'py',
-        interpreter: 'py'
+        interpreter: 'python3'
     }
 }
 
@@ -104,16 +104,22 @@ function compile(langName) {
                 console.log(error);
                 console.log(stdout);
                 console.log(stderr);
-                //No errors good to go
+                //No errors, good to go
                 if(!err && !stderr) {
                     console.log('No errors my friend')
                     // Java runs by JVM which is different, take care of it here
                     if(name === "Java"){
                         exec(`${runner} ${executable}`, (error, stdout, stderr) => {
                             // Writing stdout to completed.txt
-                            fs.writeFile('completed.txt', stdout + `\n Created @ ${new Date}`, {encoding: 'utf8'}, () => {
-                                console.log('Sucessful compilation');
-                            })
+                            if(!error && !stderr) {
+                                fs.writeFile('completed.txt', stdout + `\n Created @ ${new Date}`, {encoding: 'utf8'}, () => {
+                                    console.log('Sucessful compilation');
+                                })
+                            } else {
+                                fs.writeFile("error.txt", err + stderr, () => {
+                                    console.log("error logged");
+                                })
+                            }
                         })
                     // Handling languages that gives us executable files
                     }else {
@@ -126,14 +132,14 @@ function compile(langName) {
                                     console.log('Sucessful compilation');
                                 })
                             } else {
-                                fs.writeFile("errors.txt", err + stderr, () => {
+                                fs.writeFile("error.txt", err + stderr, () => {
                                     console.log("error logged");
                                 })
                             }
                         })
                     }
                 }else {
-                    fs.writeFile("errors.txt", err + stderr, () => {
+                    fs.writeFile("error.txt", err + stderr, () => {
                         console.log("error logged");
                     })
                 }

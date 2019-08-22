@@ -26,9 +26,17 @@ const saveCode = (code, language,  id, callback) => {
                 const folderToMount = path.join(__dirname, "temp", id);
                 console.log(folderToMount);
                 exec(`sudo docker run --rm -v ${folderToMount}:/app/usercode ${imageName} node . ${language}`, (error, stdout, stderr) => {
-                    const result = (fs.readFileSync(path.join(__dirname, "temp", id, "completed.txt"))).toString();
-                    console.log(`result: ${result}`)
-                    callback(result);
+                    fs.access(path.join(__dirname, "temp", id, "completed.txt"), (err) => {
+                        if(!err){
+                            const result = (fs.readFileSync(path.join(__dirname, "temp", id, "completed.txt"))).toString();
+                            console.log(err)
+                            callback(result);
+                        } else {
+                            const result = (fs.readFileSync(path.join(__dirname, "temp", id, "error.txt"))).toString();
+                            console.log(err)
+                            callback(result);
+                        }
+                    })
                 })
             });
         }
@@ -52,8 +60,12 @@ app.get("/", (req, res, next) => {
 app.post("/compile", (req, res, next) => {
     console.log(req.body)
     const { code, language } = req.body;
-    saveCode(code, language, generateId(16), (result) => {
-        res.send(`<h1>${result}</h1>`);
+    const id = generateId(16);
+    saveCode(code, language, id, (result) => {
+        exec(`rm -rf ./temp/${id}`, (err, stdout, stderr) => {
+            console.log(err, stderr)
+            res.send(`<h1>${result}</h1>`);
+        });
     });
 
 })
