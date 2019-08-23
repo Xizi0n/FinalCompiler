@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const fs = require("fs");
 const path = require("path");
 const crypto = require('crypto');
+const resposeTime = require("response-time");
 const exec = require('child_process').exec;
 
 const languageDetails = {
@@ -62,6 +63,7 @@ const generateId = (size) => {
 const app = express();
 const port = 3333;
 
+app.use(resposeTime());
 app.use(bodyParser.urlencoded());
 
 app.get("/", (req, res, next) => {
