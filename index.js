@@ -6,6 +6,8 @@ const crypto = require("crypto");
 const resposeTime = require("response-time");
 const exec = require("child_process").exec;
 
+const isAuth = require("./middleware/isAuth");
+
 const languageDetails = {
   javascript: "js",
   c: "c",
@@ -92,7 +94,7 @@ app.use((req, res, next) => {
 });
 app.use(bodyParser.json());
 
-app.post("/compile", (req, res, next) => {
+app.post("/compile", isAuth, (req, res, next) => {
   console.log(req.body);
   const { code, language } = req.body;
   const id = generateId(16);
